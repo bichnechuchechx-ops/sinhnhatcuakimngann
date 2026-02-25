@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Chúc mừng sinh nhật chị Kim Ngân</title>
+
+<style>
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:#ffe4ec;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.hidden{display:none;}
+
+/* ===== KHÓA ===== */
+.lock{text-align:center;}
+.dots{margin:20px;}
+.dot{
+    width:14px;height:14px;border-radius:50%;
+    border:2px solid #ff7aa8;display:inline-block;margin:5px;
+}
+.filled{background:#ff7aa8;}
+
+.keypad{
+    display:grid;
+    grid-template-columns:repeat(3,80px);
+    gap:15px;justify-content:center;
+}
+.key{
+    width:80px;height:80px;border-radius:50%;
+    border:2px solid #ff7aa8;
+    display:flex;align-items:center;justify-content:center;
+    color:#ff7aa8;font-size:22px;cursor:pointer;
+}
+
+/* ===== GAME ===== */
+.game{text-align:center;}
+.grid{
+    display:grid;
+    grid-template-columns:repeat(4,70px);
+    gap:10px;justify-content:center;
+}
+.card{
+    width:70px;height:70px;background:white;
+    border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:28px;cursor:pointer;
+}
+
+/* ===== SINH NHẬT ===== */
+.birthday{
+    text-align:center;
+    background:white;
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+    max-width:420px;
+}
+.cake{font-size:60px;margin:10px 0;}
+p{line-height:1.6;color:#444;}
+</style>
+</head>
+
+<body>
+
+<!-- 🔐 KHÓA -->
+<div class="lock" id="lock">
+    <h3>Nhập mã khoá</h3>
+    <div class="dots">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+    </div>
+
+    <div class="keypad">
+        <div class="key">1</div>
+        <div class="key">2</div>
+        <div class="key">3</div>
+        <div class="key">4</div>
+        <div class="key">5</div>
+        <div class="key">6</div>
+        <div class="key">7</div>
+        <div class="key">8</div>
+        <div class="key">9</div>
+        <div></div>
+        <div class="key">0</div>
+        <div class="key">X</div>
+    </div>
+</div>
+
+<!-- 🧩 GAME -->
+<div class="game hidden" id="game">
+    <h3>Lật thẻ giống nhau để mở 🎁</h3>
+    <div class="grid" id="grid"></div>
+</div>
+
+<!-- 🎉 SINH NHẬT -->
+<div class="birthday hidden" id="birthday">
+    <h1>Chúc Mừng Sinh Nhật</h1>
+    <div class="cake">🎂</div>
+    <p>
+    Chúc mừng sinh nhật chị Kim Ngân.  
+    Chúc chị một tuổi mới thật nhiều sức khỏe, bình an và mọi điều thuận lợi trong công việc cũng như cuộc sống.
+
+    Mong rằng những dự định của chị trong năm nay đều diễn ra suôn sẻ,  
+    những cố gắng của chị sẽ được đền đáp xứng đáng,  
+    và mỗi ngày trôi qua đều có thêm lý do để chị mỉm cười.
+
+    Cảm ơn chị vì luôn là người chị đáng tin cậy và ấm áp trong gia đình.  
+    Chúc chị Kim Ngân luôn vững vàng, hạnh phúc và an nhiên trên con đường mình chọn.
+    </p>
+</div>
+
+<!-- 🎵 NHẠC -->
+<audio id="music" loop>
+    <source src="nhac (4).mp3" type="audio/mpeg">
+</audio>
+
+<script>
+/* ===== MÃ KHÓA ===== */
+const correct="2502";
+let input="";
+const dots=document.querySelectorAll(".dot");
+
+document.querySelectorAll(".key").forEach(k=>{
+    k.onclick=()=>{
+        if(k.innerText==="X"){ input=input.slice(0,-1); }
+        else if(input.length<4){ input+=k.innerText; }
+
+        dots.forEach((d,i)=>d.classList.toggle("filled",i<input.length));
+
+        if(input.length===4){
+            if(input===correct){
+                lock.classList.add("hidden");
+                game.classList.remove("hidden");
+            }else{
+                alert("Sai mã");
+                input="";
+                dots.forEach(d=>d.classList.remove("filled"));
+            }
+        }
+    }
+});
+
+/* ===== GAME ===== */
+const icons=["🎁","🎂","💖","🌸","🎉","🍰"];
+let cards=[...icons,...icons];
+cards.sort(()=>Math.random()-0.5);
+
+const grid=document.getElementById("grid");
+let first=null,lockBoard=false,matched=0;
+
+cards.forEach(icon=>{
+    const card=document.createElement("div");
+    card.className="card";
+    card.dataset.icon=icon;
+
+    card.onclick=()=>{
+        if(lockBoard||card.innerText) return;
+        card.innerText=icon;
+
+        if(!first){ first=card; return; }
+
+        if(first.dataset.icon===card.dataset.icon){
+            matched++;
+            first=null;
+
+            if(matched===icons.length){
+                game.classList.add("hidden");
+                birthday.classList.remove("hidden");
+                document.getElementById("music").play();
+            }
+        }else{
+            lockBoard=true;
+            setTimeout(()=>{
+                card.innerText="";
+                first.innerText="";
+                first=null;
+                lockBoard=false;
+            },700);
+        }
+    };
+
+    grid.appendChild(card);
+});
+</script>
+
+</body>
+</html>
